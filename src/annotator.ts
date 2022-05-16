@@ -81,6 +81,7 @@ export function annotator(
     const e = canvas;
     let t = !1;
     e.forEachObject(function (n) {
+      // @ts-ignore
       if (n.data && 'annotation' === n.data.type && !n.label) {
         e.remove(n);
         t = !0;
@@ -254,6 +255,17 @@ export function annotator(
   canvas.on('object:rotating', (e) => {
     const target = e.target;
     isDrawing = false;
+  });
+
+  canvas.on('mouse:wheel', (opt) => {
+    const delta = opt.e.deltaY;
+    let zoom = canvas.getZoom();
+    zoom *= 0.999 ** delta;
+    if (zoom > 20) zoom = 20;
+    if (zoom < 0.01) zoom = 0.01;
+    canvas.setZoom(zoom);
+    opt.e.preventDefault();
+    opt.e.stopPropagation();
   });
 
   // canvas.on('mouse:down', ({ e }) => {
