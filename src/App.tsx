@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, Grid, Stack, TextField } from '@mui/material';
+import { Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
 import { fabric } from 'fabric';
 
 import { Canvas } from './Canvas';
@@ -165,6 +165,12 @@ function App() {
       <Grid item md={4}>
         <Box sx={{ padding: 2 }}>
           <Stack spacing={2}>
+            <Typography variant="body1">
+              Hold [Alt] Key to drag the document around.
+            </Typography>
+            <Typography variant="body1">
+              Use the mouse wheel to zoom in and out.
+            </Typography>
             <Stack direction="row" spacing={2}>
               <Button onClick={zoomOut} variant="outlined">
                 Zoom Out
