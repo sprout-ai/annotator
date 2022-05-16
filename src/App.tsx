@@ -3,7 +3,7 @@ import { Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
 import { fabric } from 'fabric';
 
 import { Canvas } from './Canvas';
-import exampleImage from './example.png';
+import exampleImage from './example-paper.png';
 
 const SCALE_STEP = 0.1;
 
