@@ -17,3 +17,17 @@ Builds the app for production to the `dist` folder.
 
 Builds the app for production and serves the `dist` folder.
 Open http://localhost:4173/annotator/
+
+## Custom fabric.min.js
+
+http://fabricjs.com/build/
+
+For building a smaller version of fabric.min.js. The following options are selected for only displaying rects in canvas and for interactions:
+
+- Text
+- Gestures
+- Animation
+- Object straightening
+- Interaction
+- fabric.Rect
+- fabric.Image
