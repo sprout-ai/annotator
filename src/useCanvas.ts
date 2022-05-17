@@ -1,5 +1,5 @@
 import { MutableRefObject, useCallback } from 'react';
-import { fabric } from 'fabric-pure-browser';
+import { fabric } from 'fabric';
 
 export function useCanvas(canvas: MutableRefObject<fabric.Canvas>) {
   return useCallback((element: HTMLCanvasElement) => {
