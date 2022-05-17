@@ -7,6 +7,6 @@ export function useCanvas(canvas: MutableRefObject<fabric.Canvas>) {
       return canvas.current?.dispose();
     }
 
-    canvas.current = new fabric.Canvas(element, { backgroundColor: '#eee' });
+    canvas.current = new fabric.Canvas(element);
   }, []);
 }

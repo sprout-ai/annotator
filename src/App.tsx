@@ -6,26 +6,45 @@ import { Canvas } from './Canvas';
 import exampleImage from './example-paper.png';
 
 const SCALE_STEP = 0.1;
+const PADDING = 32; // 2 x 8 x 2 (default padding for mui is 8 and both sides)
 
 function App() {
   const [count, setCount] = useState(0);
   const canvasRef = useRef<fabric.Canvas>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const documentWidth = useRef<number>();
+  const documentHeight = useRef<number>();
 
+  // display document and resize canvas
   useEffect(() => {
     const canvas = canvasRef.current!;
 
     function setCurrentDimensions() {
-      canvas.setHeight(canvasContainerRef.current!.clientHeight - 32 || 0);
-      canvas.setWidth(canvasContainerRef.current!.clientWidth - 32 || 0);
+      canvas.setHeight(canvasContainerRef.current!.clientHeight - PADDING || 0);
+      canvas.setWidth(canvasContainerRef.current!.clientWidth - PADDING || 0);
       canvas.renderAll();
     }
 
     function setBackgroundImage() {
       fabric.Image.fromURL(exampleImage, function (img) {
-        img.scaleToWidth(canvasContainerRef.current!.clientWidth - 32);
-        img.scaleToHeight(canvasContainerRef.current!.clientHeight - 32);
+        img.scaleToWidth(canvasContainerRef.current!.clientWidth - PADDING);
+        img.scaleToHeight(canvasContainerRef.current!.clientHeight - PADDING);
         img.set('selectable', false);
+
+        if (img) {
+          // get size of scaled document and resize canvas dimensions
+          // @ts-ignore
+          const adjustedWidth = img.width * img.scaleX;
+          // @ts-ignore
+          const adjustedHeight = img.height * img.scaleY;
+          documentWidth.current = adjustedWidth;
+          documentHeight.current = adjustedHeight;
+
+          canvas.setDimensions({
+            width: adjustedWidth,
+            height: adjustedHeight
+          });
+        }
 
         canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
           originX: 'left',
@@ -58,18 +77,40 @@ function App() {
 
       zoom *= 0.999 ** delta;
 
-      if (zoom > 20) {
-        zoom = 20;
+      if (zoom > 5) {
+        zoom = 5;
       }
 
-      if (zoom < 0.01) {
-        zoom = 0.01;
+      if (zoom < 0.5) {
+        zoom = 0.5;
       }
 
       canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
 
       opt.e.preventDefault();
       opt.e.stopPropagation();
+
+      // @ts-ignore
+      const _this = this;
+      const vpt = _this.viewportTransform;
+      const maxPanWidth = documentWidth.current!;
+      const maxPanHeight = documentHeight.current!;
+
+      if (zoom < maxPanHeight / maxPanHeight) {
+        vpt[4] = maxPanWidth / 2 - (maxPanWidth * zoom) / 2;
+        vpt[5] = maxPanHeight / 2 - (maxPanHeight * zoom) / 2;
+      } else {
+        if (vpt[4] >= 0) {
+          vpt[4] = 0;
+        } else if (vpt[4] < canvas.getWidth() - maxPanWidth * zoom) {
+          vpt[4] = canvas.getWidth() - maxPanWidth * zoom;
+        }
+        if (vpt[5] >= 0) {
+          vpt[5] = 0;
+        } else if (vpt[5] < canvas.getHeight() - maxPanHeight * zoom) {
+          vpt[5] = canvas.getHeight() - maxPanHeight * zoom;
+        }
+      }
     });
 
     canvas.on('mouse:down', function (opt) {
@@ -122,27 +163,28 @@ function App() {
   }
 
   function addBox() {
-    const maxWidth = canvasContainerRef.current?.clientWidth;
-    const maxHeight = canvasContainerRef.current?.clientHeight;
+    const maxWidth = documentWidth.current!;
+    const maxHeight = documentHeight.current!;
 
     canvasRef.current
       ?.getObjects()
       .forEach((obj) => canvasRef.current?.remove(obj));
 
     for (let i = 0; i < count; i++) {
-      canvasRef.current?.add(
-        new fabric.Rect({
-          top: Math.floor(Math.random() * (maxHeight! - 20)),
-          left: Math.floor(Math.random() * (maxWidth! - 100)),
-          width: 100,
-          height: 20,
-          fill: 'transparent',
-          selectable: false,
-          stroke: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-          strokeWidth: 1
-        })
-      );
+      const rect = new fabric.Rect({
+        top: Math.floor(Math.random() * (maxHeight! - 20)),
+        left: Math.floor(Math.random() * (maxWidth! - 100)),
+        width: 100,
+        height: 20,
+        fill: 'transparent',
+        selectable: false,
+        stroke: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+        strokeWidth: 1
+      });
+      canvasRef.current?.add(rect);
     }
+
+    canvasRef.current?.renderAll();
   }
 
   return (
@@ -151,12 +193,14 @@ function App() {
         <Box
           ref={canvasContainerRef}
           sx={{
+            backgroundColor: ({ palette }) => palette.grey[100],
             borderRightColor: ({ palette }) => palette.grey[300],
             borderRightStyle: 'solid',
             borderRightWidth: 1,
+            display: 'flex',
+            justifyContent: 'center',
             height: 1,
-            padding: 2,
-            width: 1
+            padding: 2
           }}
         >
           <Canvas canvas={canvasRef} />
