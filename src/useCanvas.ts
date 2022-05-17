@@ -1,5 +1,5 @@
 import { MutableRefObject, useCallback } from 'react';
-import { fabric } from 'fabric';
+import type { fabric } from 'fabric';
 
 export function useCanvas(canvas: MutableRefObject<fabric.Canvas>) {
   return useCallback((element: HTMLCanvasElement) => {
@@ -7,6 +7,6 @@ export function useCanvas(canvas: MutableRefObject<fabric.Canvas>) {
       return canvas.current?.dispose();
     }
 
-    canvas.current = new fabric.Canvas(element);
+    canvas.current = new window.fabric.Canvas(element);
   }, []);
 }

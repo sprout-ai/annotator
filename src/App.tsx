@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
-import { fabric } from 'fabric';
+import type { fabric } from 'fabric';
 
 import { Canvas } from './Canvas';
-import exampleImage from './example-paper.png';
 
 const SCALE_STEP = 0.1;
 const PADDING = 32; // 2 x 8 x 2 (default padding for mui is 8 and both sides)
@@ -26,7 +25,7 @@ function App() {
     }
 
     function setBackgroundImage() {
-      fabric.Image.fromURL(exampleImage, function (img) {
+      window.fabric.Image.fromURL('./example-paper.png', function (img) {
         img.scaleToWidth(canvasContainerRef.current!.clientWidth - PADDING);
         img.scaleToHeight(canvasContainerRef.current!.clientHeight - PADDING);
         img.set('selectable', false);
@@ -171,7 +170,7 @@ function App() {
       .forEach((obj) => canvasRef.current?.remove(obj));
 
     for (let i = 0; i < count; i++) {
-      const rect = new fabric.Rect({
+      const rect = new window.fabric.Rect({
         top: Math.floor(Math.random() * (maxHeight! - 20)),
         left: Math.floor(Math.random() * (maxWidth! - 100)),
         width: 100,
@@ -242,5 +241,10 @@ function App() {
     </Grid>
   );
 }
+
+// function App() {
+//   console.log(window.fabric);
+//   return <div>Hello world</div>;
+// }
 
 export default App;

@@ -20,5 +20,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/fabric.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
